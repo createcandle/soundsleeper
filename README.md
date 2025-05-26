@@ -8,3 +8,10 @@ Currently it can only detect snoring.
 
 This is based on:
 https://github.com/Trinity1804/Snoresense
+
+
+## Learn more
+
+About Candle:
+
+https://www.candlesmarthome.com
