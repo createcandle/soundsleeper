@@ -263,7 +263,7 @@ echo "PACKAGE.SH ALMOST THERE FOR PYTHON LIBS"
 echo "LS lib after second round of pip:"
 ls lib
 
-#python3.11 -m pip install torch -t lib --no-cache-dir --prefix "" --global-option="-mfloat-abi=hard"
+python3.11 -m pip install torch -t lib --no-cache-dir --prefix "" --global-option="-mfloat-abi=hard"
 #python3.11 -m pip install numpy -t lib --no-cache-dir --no-binary :all: --prefix "" --global-option="-mfloat-abi=hard"
 python3.11 -m pip install -r requirements.txt -t lib --no-cache-dir --no-binary :all: --prefix ""
 
