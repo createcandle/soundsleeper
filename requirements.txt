@@ -1,6 +1,3 @@
-#torch
-#numpy
 sounddevice
 librosa
 torchvision
-git+https://github.com/WebThingsIO/gateway-addon-python.git
