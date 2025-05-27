@@ -42,19 +42,25 @@ class SoundSleeperAdapter(Adapter):
 
         verbose -- whether or not to enable verbose logging
         """
-        print("Initialising SoundSleeper")
+        #print("Initialising SoundSleeper")
         self.pairing = False
         self.name = self.__class__.__name__
-        self.addon_name = 'sound_sleeper'
-        Adapter.__init__(self, 'sound_sleeper', 'sound_sleeper', verbose=verbose)
+        self.addon_name = 'soundsleeper'
+        Adapter.__init__(self, 'soundsleeper', 'soundsleeper', verbose=verbose)
         #print("Adapter ID = " + self.get_id())
 
         self.addon_path = os.path.join(self.user_profile['addonsDir'], self.addon_name)
+
+        self.addon_path = os.path.join(self.user_profile['addonsDir'], self.addon_name)
+
+        self.snore_sense_model_path = os.path.join(self.addon_path, 'models','snore_model.pth')
 
         self.DEBUG = True
         self.running = True
         
         self.interval = 2 # in seconds
+        
+        self.snoring = False
         
         
         try:
@@ -78,7 +84,7 @@ class SoundSleeperAdapter(Adapter):
             #targetProperty = self.thing.find_property('current_description')
             #time.sleep(1)
 
-        print("creating Snore Sense thread")
+        #print("creating Snore Sense thread")
         t = threading.Thread(target=self.snore_sense)
         t.daemon = True
         t.start()
@@ -88,18 +94,19 @@ class SoundSleeperAdapter(Adapter):
         
         
 
-    def snore_sense():
+    def snore_sense(self):
+        
         #
         # SnoreSense parts
         #
         
-        snore_sense_device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-        print(f"Using device: {snore_sense_device}")
+        self.snore_sense_device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        #print(f"Using device: {self.snore_sense_device}")
 
-        # Load the trained model
-        snore_sense_model_path = "models/snore_model.pth"
-        snore_sense_model = load_model(snore_sense_model_path, snore_sense_device)
-        
+        # Parameters
+        sr = 22050
+        duration = 3  # 5 seconds
+        self.snore_sense_buffer = np.zeros(sr * duration)
         
         
         def load_model(model_path, device):
@@ -167,35 +174,43 @@ class SoundSleeperAdapter(Adapter):
             return predicted.item()
 
 
-        # Parameters
-        sr = 22050
-        duration = 3  # 5 seconds
-        snore_sense_buffer = np.zeros(sr * duration)
+        
 
 
         # Callback function for real-time audio processing
         def audio_callback(indata, frames, time, status):
-            global snore_sense_buffer
+            #global self.snore_sense_buffer
             if status:
                 print(status)
 
             # Accumulate audio data in the buffer
-            snore_sense_buffer[:-frames] = snore_sense_buffer[frames:]
-            snore_sense_buffer[-frames:] = indata[:, 0]
+            self.snore_sense_buffer[:-frames] = self.snore_sense_buffer[frames:]
+            self.snore_sense_buffer[-frames:] = indata[:, 0]
 
             # Check if buffer is full (5 seconds of audio)
-            if np.count_nonzero(buffer) > 0:
-                prediction = predict(model, snore_sense_buffer, device)
+            if np.count_nonzero(self.snore_sense_buffer) > 0:
+                prediction = predict(model, self.snore_sense_buffer, self.snore_sense_device)
                 label = "Snoring" if prediction == 1 else "Non-Snoring"
-                print(f"Prediction: {label}")
+                #print(f"Prediction: {label}")
+                
+                if self.snoring != bool(prediction):
+                    
+                    self.snoring = bool(prediction)
+                    self.devices['sound_sleeper_thing'].properties['snoring'].update( self.snoring )
+                    #print("snoring changed to: " + str(self.snoring))
+                    
         
         
         
         
+        
+        # Load the trained model
+        #snore_sense_model_path = "models/snore_model.pth"
+        model = load_model(self.snore_sense_model_path, self.snore_sense_device)
         
         
         with sd.InputStream( callback=audio_callback, channels=1, samplerate=sr, blocksize=int(sr * 0.5)):
-            print("Listening... ")
+            #print("Listening... ")
             sd.sleep(1000000)  # Keep
 
         
