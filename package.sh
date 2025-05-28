@@ -265,9 +265,9 @@ ls lib
 
 # --config-settings
 
-python3.11 -m pip install torch torchvision numpy -t lib --prefix ""
+python3.11 -m pip install sounddevice torch numpy torchvision librosa -t lib --prefix ""
 #python3.11 -m pip install numpy -t lib --no-cache-dir --no-binary :all: --prefix "" --global-option="-mfloat-abi=hard"
-python3.11 -m pip install -r requirements.txt -t lib --no-cache-dir --no-binary :all: --prefix ""
+#python3.11 -m pip install -r requirements.txt -t lib --no-cache-dir --no-binary :all: --prefix ""
 
 
 # Put package together
