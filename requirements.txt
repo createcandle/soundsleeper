@@ -1,3 +1,2 @@
 sounddevice
-librosa
-torchvision==0.22.0
+#torchvision==0.22.0
