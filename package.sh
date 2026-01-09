@@ -99,8 +99,8 @@ apt install -y \
 echo ""
 echo "."
 
-echo "Attempting Python 3.11 dev modules"
-apt install -y pkg-config python3.11-dev libpython3.11-dev
+echo "Attempting Python 3.13 dev modules"
+apt install -y pkg-config python3.13-dev libpython3.13-dev
 
 #echo "Attempting libcairo install"
 #apt install -y libcairo2-dev
@@ -238,9 +238,9 @@ echo ""
 #python3.11 -m pip install --upgrade pip
 #python3.11 -m pip install --upgrade setuptools wheel
 
-apt install -y python3.11-distutils
-curl -sS https://bootstrap.pypa.io/get-pip.py | python3.11
-python3.11 -m pip install --upgrade setuptools==70.0.0 wheel
+apt install -y python3.13-distutils
+curl -sS https://bootstrap.pypa.io/get-pip.py | python3
+python3 -m pip install --upgrade setuptools==70.0.0 wheel
 
 
 echo ""
@@ -265,7 +265,7 @@ ls lib
 
 # --config-settings
 
-python3.11 -m pip install sounddevice torch numpy torchvision librosa -t lib --prefix ""
+python3 -m pip install sounddevice torch numpy torchvision librosa -t lib --prefix ""
 #python3.11 -m pip install numpy -t lib --no-cache-dir --no-binary :all: --prefix "" --global-option="-mfloat-abi=hard"
 #python3.11 -m pip install -r requirements.txt -t lib --no-cache-dir --no-binary :all: --prefix ""
 
